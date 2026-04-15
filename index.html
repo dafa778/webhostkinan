@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel Deploy | KinanDev</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Background overlay biar teks keliatan -->
+    <div class="overlay"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fab fa-vercel"></i>
+                <span>Vercel Deploy Tool</span>
+            </div>
+            <div class="badge">
+                <i class="fas fa-skull"></i> KinanDev Edition
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="main-card">
+            <h1>
+                <i class="fas fa-rocket"></i>
+                Deploy to Vercel
+            </h1>
+            <p class="subtitle">Upload project + API Token → Auto deploy ke Vercel</p>
+
+            <!-- SECTION 1: API TOKEN VERCEL (PALING PENTING) -->
+            <div class="token-section">
+                <h3><i class="fas fa-key"></i> Vercel API Token</h3>
+                <div class="token-input-wrapper">
+                    <input type="password" id="vercelToken" placeholder="Masukkan Vercel API Token (vcp_2mRSZvgYw8QHhi6Etnzfy7h7PrudNZytyVYZ1RjeTflgBADjlJ34Uhlu)" class="token-input">
+                    <button id="toggleTokenBtn" class="toggle-token">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="token-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Token tidak disimpan, hanya dipakai untuk deploy saat itu juga</span>
+                </div>
+                <div class="token-help">
+                    <a href="https://vercel.com/account/tokens" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Dapetin Token di sini
+                    </a>
+                </div>
+            </div>
+
+            <!-- SECTION 2: UPLOAD PROJECT -->
+            <div class="upload-section">
+                <h3><i class="fas fa-cloud-upload-alt"></i> Upload Project</h3>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-file-archive"></i>
+                    </div>
+                    <h3>Drag & Drop ZIP File</h3>
+                    <p>atau</p>
+                    <button class="browse-btn" id="browseBtn">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                    <input type="file" id="fileInput" accept=".zip" style="display: none;">
+                    <p class="upload-hint">Support: ZIP only | Max 50MB</p>
+                </div>
+
+                <!-- Project Info -->
+                <div class="project-info" id="projectInfo" style="display: none;">
+                    <div class="info-card">
+                        <i class="fas fa-file-archive"></i>
+                        <div class="info-details">
+                            <strong>Project:</strong>
+                            <span id="projectName"></span>
+                            <br>
+                            <strong>Size:</strong>
+                            <span id="projectSize"></span>
+                        </div>
+                        <button class="remove-btn" id="removeProject">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: DEPLOY CONFIG -->
+            <div class="config-section" id="configSection" style="display: none;">
+                <h3><i class="fas fa-sliders-h"></i> Configuration</h3>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Project Name</label>
+                    <input type="text" id="projectNameInput" placeholder="my-awesome-project">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-code-branch"></i> Framework Preset</label>
+                    <select id="frameworkSelect">
+                        <option value="">Auto Detect</option>
+                        <option value="nextjs">Next.js</option>
+                        <option value="react">React (Create React App)</option>
+                        <option value="vue">Vue.js</option>
+                        <option value="angular">Angular</option>
+                        <option value="nodejs">Node.js</option>
+                        <option value="static">Static HTML/CSS/JS</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-cog"></i> Build Command (Optional)</label>
+                    <input type="text" id="buildCommand" placeholder="npm run build">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-folder"></i> Output Directory (Optional)</label>
+                    <input type="text" id="outputDir" placeholder="dist, build, .next">
+                </div>
+
+                <button class="deploy-btn" id="deployBtn">
+                    <i class="fas fa-rocket"></i> Deploy to Vercel
+                </button>
+            </div>
+
+            <!-- DEPLOY STATUS -->
+            <div class="deploy-status" id="deployStatus" style="display: none;">
+                <div class="status-card">
+                    <div class="status-icon">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                    </div>
+                    <h3>Deploying...</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="status-message" id="statusMessage">Initializing...</p>
+                    <div class="log-console" id="logConsole">
+                        <div class="log-line">[KinanDev] Starting deployment process...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULT SUCCESS -->
+            <div class="result-card success" id="resultCard" style="display: none;">
+                <div class="result-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Deployment Successful!</h3>
+                <p>Your project is live on Vercel</p>
+                <div class="result-url">
+                    <i class="fas fa-link"></i>
+                    <span id="deployUrl"></span>
+                    <button class="copy-btn" id="copyUrl">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="result-buttons">
+                    <button class="visit-btn" id="visitUrl">
+                        <i class="fas fa-external-link-alt"></i> Visit Site
+                    </button>
+                    <button class="new-deploy-btn" id="newDeploy">
+                        <i class="fas fa-plus"></i> New Deployment
+                    </button>
+                </div>
+            </div>
+
+            <!-- RESULT ERROR -->
+            <div class="result-card error" id="errorCard" style="display: none;">
+                <div class="result-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <h3>Deployment Failed</h3>
+                <p id="errorMessage"></p>
+                <button class="new-deploy-btn" id="newDeployError">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Made with <i class="fas fa-skull"></i> by KinanDev | Your token stays private</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
